@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
+
+	"github.com/myprivatealaska/bradfield-database-systems/common"
 )
 
 const OFFSET_SIZE_BYTES = 2
@@ -11,12 +13,12 @@ const INT_SIZE_BYTES = 8
 
 type FileWriter struct {
 	Writer         io.Writer
-	ColumnMetadata map[string]SupportedAttributeTypes
+	ColumnMetadata map[string]common.SupportedAttributeTypes
 	NumTuples      int
 	TuplesWritten  int
 }
 
-func NewFileWriter(w io.Writer, colMeta map[string]SupportedAttributeTypes, numTuples int) *FileWriter {
+func NewFileWriter(w io.Writer, colMeta map[string]common.SupportedAttributeTypes, numTuples int) *FileWriter {
 	return &FileWriter{
 		Writer:         w,
 		ColumnMetadata: colMeta,
@@ -45,7 +47,7 @@ func (fw *FileWriter) writeHeader() error {
 	return nil
 }
 
-func (fw *FileWriter) WriteTuple(t Tuple) error {
+func (fw *FileWriter) WriteTuple(t common.Tuple) error {
 
 	if fw.TuplesWritten == 0 {
 		err := fw.writeHeader()

@@ -4,12 +4,14 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+
+	"github.com/myprivatealaska/bradfield-database-systems/common"
 )
 
 type FileReader struct {
 	Reader         io.Reader
 	ColumnsNum     int
-	ColumnMetadata map[string]SupportedAttributeTypes
+	ColumnMetadata map[string]common.SupportedAttributeTypes
 	NumTuples      int
 	TuplesRead     int
 }

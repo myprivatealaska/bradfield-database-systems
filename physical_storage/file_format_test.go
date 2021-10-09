@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"io"
 	"testing"
+
+	"github.com/myprivatealaska/bradfield-database-systems/common"
 )
 
 func TestFileScanner(t *testing.T) {
@@ -48,7 +50,7 @@ func TestFileScanner(t *testing.T) {
 
 // NewMemoryTestFile creates a new Bradfield file format file with the provided tuples
 // that is stored in memory.
-func NewMemoryTestFile(t *testing.T, columns []string, tuples []Tuple) io.Reader {
+func NewMemoryTestFile(t *testing.T, columns []string, tuples []common.Tuple) io.Reader {
 	colMeta := map[string]interface{}{
 		"name": "string",
 		"age":  "int64",
