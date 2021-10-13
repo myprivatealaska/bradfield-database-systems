@@ -9,26 +9,19 @@ type selection struct {
 	child         common.Node
 }
 
-func NewSelection() *selection {
+func NewSelection(predicateFunc func(t common.Tuple) bool, child common.Node) *selection {
 	return &selection{
-		predicateFunc: nil,
-		child:         nil,
+		predicateFunc: predicateFunc,
+		child:         child,
 	}
 }
 
 func (s *selection) Next() *common.Tuple {
-	return s.getFirstMatch()
-}
-
-func (s *selection) getFirstMatch() *common.Tuple {
-	t := s.child.Next()
-	if t == nil {
-		return nil
+	for t := s.child.Next(); t != nil; t = s.child.Next() {
+		result := s.predicateFunc(*t)
+		if result == true {
+			return t
+		}
 	}
-	result := s.predicateFunc(*t)
-	if result == true {
-		return t
-	} else {
-		return s.getFirstMatch()
-	}
+	return nil
 }

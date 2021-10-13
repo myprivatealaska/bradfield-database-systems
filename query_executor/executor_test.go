@@ -48,3 +48,16 @@ func TestLimitQuery(t *testing.T) {
 	results := Execute(projectNode)
 	logger.Info("Result", zap.Any("Tuple array", results))
 }
+
+func TestSelectionQuery(t *testing.T) {
+	logger, _ := zap.NewDevelopment()
+	logger.Info("SELECT * FROM movies WHERE name = \"Waiting to Exhale (1995)\"")
+	scanNode := NewScan(&data, 3)
+
+	predF := func(tuple common.Tuple) bool {
+		return tuple["name"] == "Waiting to Exhale (1995)"
+	}
+	selectNode := NewSelection(predF, scanNode)
+	results := Execute(selectNode)
+	logger.Info("Result", zap.Any("Tuple array", results))
+}

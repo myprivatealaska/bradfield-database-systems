@@ -31,7 +31,7 @@ func (s *scan) Next() *common.Tuple {
 	if s.CurrIndex >= s.BufferSize {
 		s.loadBuffer()
 	}
-	if len(s.Buffer) < s.CurrIndex {
+	if len(s.Buffer) <= s.CurrIndex {
 		return nil
 	}
 	res := &s.Buffer[s.CurrIndex]
