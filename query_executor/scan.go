@@ -1,23 +1,33 @@
 package query_executor
 
+import (
+	"github.com/myprivatealaska/bradfield-database-systems/common"
+)
+
 // Scan which yields each row for the table as needed.
 // In this initial implementation your Scan operator can return rows from a predefined list in memory.
-type Scan struct {
+type scan struct {
 	BufferSize  int
-	Buffer      []Movie
+	Buffer      []common.Tuple
 	CurrIndex   int
 	BatchNumber int
-	InputPtr    *[]Movie
+	InputPtr    *[]common.Tuple
 }
 
-func (s *Scan) Init(inputPtr *[]Movie, bufSize int) {
-	s.BufferSize = bufSize
-	s.InputPtr = inputPtr
+// @TODO replace inputPtr with relation
+func NewScan(inputPtr *[]common.Tuple, bufSize int) *scan {
+	s := &scan{
+		BufferSize: bufSize,
+		InputPtr:   inputPtr,
+	}
+
 	s.loadBuffer()
+
+	return s
 }
 
 // Next returns nil when there is nothing left to read
-func (s *Scan) Next() *Movie {
+func (s *scan) Next() *common.Tuple {
 	if s.CurrIndex >= s.BufferSize {
 		s.loadBuffer()
 	}
@@ -30,7 +40,7 @@ func (s *Scan) Next() *Movie {
 }
 
 // in real world, we would be accessing disk here
-func (s *Scan) loadBuffer() {
+func (s *scan) loadBuffer() {
 	start := s.BatchNumber * s.BufferSize
 	end := s.BatchNumber*s.BufferSize + s.BufferSize
 
@@ -38,7 +48,7 @@ func (s *Scan) loadBuffer() {
 
 	veryEnd := len(inputVal)
 	if start >= veryEnd {
-		s.Buffer = []Movie{}
+		s.Buffer = []common.Tuple{}
 		return
 	}
 	if end > veryEnd {

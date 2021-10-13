@@ -1,22 +1,27 @@
 package query_executor
 
-type Limit struct {
+import (
+	"github.com/myprivatealaska/bradfield-database-systems/common"
+)
+
+type limit struct {
 	LimitValue int
 	Count      int
-	ScanPtr    *Scan
+	Child      common.Node
 }
 
-func (l *Limit) Init(limitVal int) {
-	l.ScanPtr = &Scan{}
-	l.ScanPtr.Init(&data, 2)
-	l.LimitValue = limitVal
+func NewLimit(limitVal int, child common.Node) *limit {
+	return &limit{
+		LimitValue: limitVal,
+		Child:      child,
+	}
 }
 
-func (l *Limit) Next() *Movie {
+func (l *limit) Next() *common.Tuple {
 	if l.Count >= l.LimitValue {
 		return nil
 	}
-	res := l.ScanPtr.Next()
+	res := l.Child.Next()
 	l.Count++
 	return res
 }

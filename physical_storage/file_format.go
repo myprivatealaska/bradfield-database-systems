@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/myprivatealaska/bradfield-database-systems/common"
+	"go.uber.org/zap"
 )
 
 const OFFSET_SIZE_BYTES = 2
@@ -13,14 +14,17 @@ const INT_SIZE_BYTES = 8
 
 type FileWriter struct {
 	Writer         io.Writer
+	Logger         *zap.Logger
 	ColumnMetadata map[string]common.SupportedAttributeTypes
 	NumTuples      int
 	TuplesWritten  int
 }
 
 func NewFileWriter(w io.Writer, colMeta map[string]common.SupportedAttributeTypes, numTuples int) *FileWriter {
+	logger, _ := zap.NewDevelopment()
 	return &FileWriter{
 		Writer:         w,
+		Logger:         logger,
 		ColumnMetadata: colMeta,
 		NumTuples:      numTuples,
 	}
@@ -61,20 +65,21 @@ func (fw *FileWriter) WriteTuple(t common.Tuple) error {
 
 	var offset uint16
 
-	for _, attr := range t.Attributes {
-		switch attr.Value.(type) {
+	for _, val := range t {
+		fw.Logger.Info("Writing", zap.Any("Tuple", t))
+		switch val.(type) {
 		case uint64:
 			offset = 8
 			binary.BigEndian.PutUint16(offsetBytes, offset)
 			if _, err := fw.Writer.Write(offsetBytes); err != nil {
 				return err
 			}
-			binary.BigEndian.PutUint64(intBytes, attr.Value.(uint64))
+			binary.BigEndian.PutUint64(intBytes, val.(uint64))
 			if _, err := fw.Writer.Write(intBytes); err != nil {
 				return err
 			}
 		case string:
-			stringBytes := []byte(attr.Value.(string))
+			stringBytes := []byte(val.(string))
 			offset = uint16(len(stringBytes))
 			binary.BigEndian.PutUint16(offsetBytes, offset)
 			if _, err := fw.Writer.Write(offsetBytes); err != nil {
